@@ -53,7 +53,6 @@ def send_command():
         if pc_id:
             # Send the command to the PC (implementation depends on how PCs are identified)
             print(f"Sending command '{command}' to PC {pc_id}")
-            # Here, you can add logic to actually execute the command on the PC
             return jsonify({"success": True, "message": f"Command '{command}' sent to PC {pc_id}"})
         else:
             return jsonify({"success": False, "message": "PC not connected"}), 404
@@ -68,11 +67,11 @@ def index():
 # Route to serve the program page
 @app.route("/program")
 def program():
-    # Retrieve session token from the request (for demonstration purposes)
+    # Retrieve session token from query parameters
     session_token = request.args.get("session_token")
     if session_token in sessions:
-        username = sessions[session_token]
-        pc_id = connected_pcs.get(session_token)
+        username = sessions[session_token]  # Get username from sessions
+        pc_id = connected_pcs.get(session_token)  # Get PC ID
         serial_info = pc_serial_info.get(pc_id, {})  # Get serial_info for the PC
         return render_template("program.html", username=username, serial_info=serial_info)
     else:
