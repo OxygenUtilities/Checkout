@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
@@ -55,6 +55,16 @@ def send_command():
             return jsonify({"success": False, "message": "PC not connected"}), 404
     else:
         return jsonify({"success": False}), 401
+
+# Route to serve the login page
+@app.route("/")
+def index():
+    return render_template("login.html")
+
+# Route to serve the program page
+@app.route("/program")
+def program():
+    return render_template("program.html")
 
 # Run the Flask app
 if __name__ == "__main__":
