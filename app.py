@@ -70,9 +70,17 @@ def check_commands():
     session_token = data.get("session_token")
     pc_id = data.get("pc_id")
 
+    print(f"Received request with session_token: {session_token}, pc_id: {pc_id}")  # Debugging
+
     # Validate session token
     if session_token not in sessions:
+        print("Invalid session token")  # Debugging
         return jsonify({"success": False, "message": "Unauthorized: Invalid session token"}), 401
+
+    # Validate PC ID
+    if pc_id not in connected_pcs.values():
+        print("PC not registered")  # Debugging
+        return jsonify({"success": False, "message": "PC not registered"}), 404
 
     # Simulate a command (replace with your logic)
     command = None  # Replace with logic to fetch a command for the PC
