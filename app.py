@@ -6,9 +6,10 @@ app = Flask(__name__)
 VALID_USERNAME = "admin"
 VALID_PASSWORD = "password"
 
-# In-memory storage for sessions and connected PCs
+# In-memory storage for sessions, connected PCs, and serial_info
 sessions = {}
 connected_pcs = {}
+pc_serial_info = {}  # Store serial_info for each PC
 
 # Login route
 @app.route("/login", methods=["POST"])
@@ -31,9 +32,11 @@ def register_pc():
     data = request.get_json()
     session_token = data.get("session_token")
     pc_id = data.get("pc_id")  # Unique identifier for the PC
+    serial_info = data.get("serial_info")  # Get serial_info from the request
 
     if session_token in sessions:
         connected_pcs[session_token] = pc_id
+        pc_serial_info[pc_id] = serial_info  # Store serial_info for the PC
         return jsonify({"success": True})
     else:
         return jsonify({"success": False}), 401
@@ -64,7 +67,10 @@ def index():
 # Route to serve the program page
 @app.route("/program")
 def program():
-    return render_template("program.html")
+    # Retrieve serial_info for the connected PC
+    pc_id = list(connected_pcs.values())[0]  # Get the first connected PC (for demonstration)
+    serial_info = pc_serial_info.get(pc_id, {})  # Get serial_info for the PC
+    return render_template("program.html", serial_info=serial_info)
 
 # Run the Flask app
 if __name__ == "__main__":
