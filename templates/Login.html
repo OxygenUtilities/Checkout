@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body Styling */
+    body {
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Import Inter font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    /* Login Container */
+    .login-container {
+      background-color: #111;
+      border-radius: 10px;
+      padding: 40px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      animation: glowMove 2s ease-in-out infinite; /* Smoother glow animation */
+    }
+
+    /* Glow Pulse Animation */
+    @keyframes glowMove {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+      }
+    }
+
+    /* Title */
+    .login-container h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #ff0000;
+    }
+
+    /* Input Fields */
+    .login-container input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background-color: #222;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .login-container input:focus {
+      border-color: #ff0000;
+    }
+
+    /* Login Button */
+    .login-container button {
+      width: 100%;
+      padding: 10px;
+      background-color: #ff0000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-family: 'Inter', sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-container button:hover {
+      background-color: #e60000;
+    }
+
+    /* Notification Styling */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ff4444; /* Red background for error */
+      color: #fff;
+      padding: 15px 25px;
+      border-radius: 5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 1000;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .notification.hide {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>Login</h1>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- Notification -->
+  <div id="notification" class="notification">Invalid username or password.</div>
+
+  <script>
+    const CENTRAL_SERVER_URL = "https://checkout-msey.onrender.com";
+    let sessionToken = null;
+
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      // Send login request to the central server
+      fetch(`${CENTRAL_SERVER_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Invalid username or password");
+          }
+        })
+        .then((data) => {
+          sessionToken = data.session_token; // Store session token
+          localStorage.setItem("sessionToken", sessionToken); // Save session token to localStorage
+          window.location.href = "/program"; // Redirect to program page
+        })
+        .catch((error) => {
+          showNotification(error.message);
+        });
+    }
+
+    // Function to show notification
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.remove('hide');
+      notification.classList.add('show');
+
+      // Hide the notification after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        notification.classList.add('hide');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
