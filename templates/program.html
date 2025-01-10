@@ -415,23 +415,36 @@
   </div>
 
   <script>
-    const CENTRAL_SERVER_URL = "https://checkout-msey.onrender.com";
+    const CENTRAL_SERVER_URL = "http://localhost:5000"; // Update with your server URL
     let sessionToken = localStorage.getItem("sessionToken");
 
     // Function to send a command to the central server
     async function sendCommand(command) {
       try {
+        // Check if sessionToken exists
+        if (!sessionToken) {
+          throw new Error("Session token not found. Please log in.");
+        }
+
+        // Send the request to the server
         const response = await fetch(`${CENTRAL_SERVER_URL}/send_command`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": sessionToken, // Include session token in headers
           },
-          body: JSON.stringify({ command }),
+          body: JSON.stringify({ command, session_token: sessionToken }), // Include session_token in the body
         });
+
+        // Check if the response is OK
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+
+        // Parse the response and update the output box
         const data = await response.json();
         document.getElementById("output-box").textContent += `\n${data.message}`;
       } catch (error) {
+        console.error("Error sending command:", error);
         document.getElementById("output-box").textContent += `\nError: ${error.message}`;
       }
     }
