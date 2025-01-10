@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 
 app = Flask(__name__)
 
@@ -22,7 +22,7 @@ def login():
         # Generate a session token (for demonstration purposes)
         session_token = "session_" + username
         sessions[session_token] = username
-        return jsonify({"success": True, "session_token": session_token})
+        return jsonify({"success": True, "session_token": session_token, "username": username})
     else:
         return jsonify({"success": False}), 401
 
@@ -53,6 +53,7 @@ def send_command():
         if pc_id:
             # Send the command to the PC (implementation depends on how PCs are identified)
             print(f"Sending command '{command}' to PC {pc_id}")
+            # Here, you can add logic to actually execute the command on the PC
             return jsonify({"success": True, "message": f"Command '{command}' sent to PC {pc_id}"})
         else:
             return jsonify({"success": False, "message": "PC not connected"}), 404
@@ -67,10 +68,15 @@ def index():
 # Route to serve the program page
 @app.route("/program")
 def program():
-    # Retrieve serial_info for the connected PC
-    pc_id = list(connected_pcs.values())[0]  # Get the first connected PC (for demonstration)
-    serial_info = pc_serial_info.get(pc_id, {})  # Get serial_info for the PC
-    return render_template("program.html", serial_info=serial_info)
+    # Retrieve session token from the request (for demonstration purposes)
+    session_token = request.args.get("session_token")
+    if session_token in sessions:
+        username = sessions[session_token]
+        pc_id = connected_pcs.get(session_token)
+        serial_info = pc_serial_info.get(pc_id, {})  # Get serial_info for the PC
+        return render_template("program.html", username=username, serial_info=serial_info)
+    else:
+        return redirect(url_for("index"))  # Redirect to login if session is invalid
 
 # Run the Flask app
 if __name__ == "__main__":
