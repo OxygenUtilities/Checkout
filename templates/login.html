@@ -156,7 +156,8 @@
         .then((data) => {
           sessionToken = data.session_token; // Store session token
           localStorage.setItem("sessionToken", sessionToken); // Save session token to localStorage
-          window.location.href = "/program"; // Redirect to program page
+          // Redirect to program page with session token as a query parameter
+          window.location.href = `/program?session_token=${sessionToken}`;
         })
         .catch((error) => {
           showNotification(error.message);
