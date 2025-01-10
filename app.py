@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Hardcoded credentials for demonstration
 VALID_USERNAME = "admin"
@@ -60,6 +62,21 @@ def send_command():
     # Send the command to the PC (implementation depends on how PCs are identified)
     print(f"Sending command '{command}' to PC {pc_id}")
     return jsonify({"success": True, "message": f"Command '{command}' sent to PC {pc_id}"})
+
+# Route to check for commands
+@app.route("/check_commands", methods=["POST"])
+def check_commands():
+    data = request.get_json()
+    session_token = data.get("session_token")
+    pc_id = data.get("pc_id")
+
+    # Validate session token
+    if session_token not in sessions:
+        return jsonify({"success": False, "message": "Unauthorized: Invalid session token"}), 401
+
+    # Simulate a command (replace with your logic)
+    command = None  # Replace with logic to fetch a command for the PC
+    return jsonify({"success": True, "command": command})
 
 # Route to serve the login page
 @app.route("/")
