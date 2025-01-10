@@ -415,9 +415,9 @@
   </div>
 
   <script>
-    const CENTRAL_SERVER_URL = "http://localhost:5000"; // Update with your server URL
+        const CENTRAL_SERVER_URL = "https://checkout-msey.onrender.com"; // Update with your production server URL
     let sessionToken = localStorage.getItem("sessionToken");
-
+    
     // Function to send a command to the central server
     async function sendCommand(command) {
       try {
@@ -425,21 +425,21 @@
         if (!sessionToken) {
           throw new Error("Session token not found. Please log in.");
         }
-
+    
         // Send the request to the server
         const response = await fetch(`${CENTRAL_SERVER_URL}/send_command`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ command, session_token: sessionToken }), // Include session_token in the body
+          body: JSON.stringify({ command, session_token: sessionToken }),
         });
-
+    
         // Check if the response is OK
         if (!response.ok) {
           throw new Error(`Server returned ${response.status}: ${response.statusText}`);
         }
-
+    
         // Parse the response and update the output box
         const data = await response.json();
         document.getElementById("output-box").textContent += `\n${data.message}`;
@@ -448,20 +448,20 @@
         document.getElementById("output-box").textContent += `\nError: ${error.message}`;
       }
     }
-
+    
     // Functions to handle button clicks
     function runKernelSpoof() {
       sendCommand("kernel_spoof");
     }
-
+    
     function runMacSpoof() {
       sendCommand("mac_spoof");
     }
-
+    
     function runPermanentSpoof() {
       sendCommand("permanent_spoof");
     }
-
+    
     // Update the output box with the username on page load
     document.addEventListener('DOMContentLoaded', () => {
       const outputBox = document.getElementById('output-box');
