@@ -48,16 +48,18 @@ def send_command():
     session_token = data.get("session_token")
     command = data.get("command")
 
-    if session_token in sessions:
-        pc_id = connected_pcs.get(session_token)
-        if pc_id:
-            # Send the command to the PC (implementation depends on how PCs are identified)
-            print(f"Sending command '{command}' to PC {pc_id}")
-            return jsonify({"success": True, "message": f"Command '{command}' sent to PC {pc_id}"})
-        else:
-            return jsonify({"success": False, "message": "PC not connected"}), 404
-    else:
-        return jsonify({"success": False}), 401
+    # Check if the session token is valid
+    if session_token not in sessions:
+        return jsonify({"success": False, "message": "Unauthorized: Invalid session token"}), 401
+
+    # Get the PC ID associated with the session token
+    pc_id = connected_pcs.get(session_token)
+    if not pc_id:
+        return jsonify({"success": False, "message": "PC not connected"}), 404
+
+    # Send the command to the PC (implementation depends on how PCs are identified)
+    print(f"Sending command '{command}' to PC {pc_id}")
+    return jsonify({"success": True, "message": f"Command '{command}' sent to PC {pc_id}"})
 
 # Route to serve the login page
 @app.route("/")
